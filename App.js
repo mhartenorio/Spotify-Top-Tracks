@@ -4,13 +4,19 @@ import { ResponseType, useAuthRequest } from "expo-auth-session";
 import { myTopTracks, albumTracks } from "./utils/apiOptions";
 import { REDIRECT_URI, SCOPES, CLIENT_ID, ALBUM_ID } from "./utils/constants";
 import Colors from "./Themes/colors"
-import Song from './SongObject';
+import Song from './Extra Screens/Screen 1';
+import Screen2 from './Extra Screens/Screen 2';
+import Screen3 from './Extra Screens/Screen 3';
+import { NavigationContainer, StackActions } from "@react-navigation/native";
+import { createStackNavigator } from '@react-navigation/stack';
 
 // Endpoints for authorizing with Spotify
 const discovery = {
   authorizationEndpoint: "https://accounts.spotify.com/authorize",
   tokenEndpoint: "https://accounts.spotify.com/api/token"
 };
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const [token, setToken] = useState("");
@@ -52,11 +58,14 @@ export default function App() {
       artist={item.artists[0].name}
       album={item.album.name}
       duration={item.duration_ms}
-      image={item.album.images[2]} />
+      image={item.album.images[0]} 
+      preview={item.preview_url} 
+      info={item.external_urls.spotify} />
   );
 
   if (token) {
-    return (
+    function Home({}) {
+      return (
       <SafeAreaView style={styles.container}>
         <View style={{height: '8%', width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: '2%'}}>
             <Image source={require("./assets/spotify-logo.png")} style={{flex: 1, width: 30, height: 30, alignSelf: 'center', resizeMode: 'contain', marginRight: '-20%' }}/>
@@ -68,6 +77,26 @@ export default function App() {
           keyExtractor={(item) => item.id} 
         />
       </SafeAreaView>
+      )
+    }
+    return (
+      <NavigationContainer>
+        <Stack.Navigator 
+        screenOptions= {{
+          headerStyle: {
+            backgroundColor: Colors.background,
+          },
+          headerTitleStyle: {
+            alignSelf: 'center',
+            color: 'white',
+            fontWeight: 'bold',
+          },
+        }}>
+          <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
+          <Stack.Screen name="Song details" component={Screen2}/>
+          <Stack.Screen name="Song preview" component={Screen3}/>
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   } else {
     return (
